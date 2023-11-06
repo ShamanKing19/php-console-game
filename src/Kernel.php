@@ -78,64 +78,22 @@ class Kernel
             consoleLog('Ваша мана: ' . $this->hero->getMana());
             consoleLog();
 
-            // Выбор объектов на карте
-            $object = null;
-            if($this->map->getObjectsCount() > 0) {
-                $object = $this->map->chooseObject();
+            $isObjectUsed = $this->performObjectAction();
+            if(!$isObjectUsed) {
+                $this->performHeroAction();
             }
 
-            if($object) {
-                $targets = $this->map->getEnemies();
-                $targets[] = $this->hero;
-                if($object->getType() === MapObjectEffectType::ALL) {
-                    $object->setTargets($targets);
-                    $object->trigger();
-                } elseif($object->getType() === MapObjectEffectType::SINGLE) {
-                    $target = $this->map->chooseEnemy($this->hero);
-                    $targets = [$target];
-                    $object->setTargets($targets);
-                    $object->trigger();
-                }
-
-                $this->map->removeObject($object);
-            } else {
-                $enemy = $this->map->chooseEnemy();
-                consoleLog('Выбран противник: ' . $enemy->getName());
-
-                $ability = $this->hero->chooseAbility();
-                consoleLog('Применяем "' . $ability->getName() . '" на противника "' . $enemy->getName() . '"');
-
-                $success = $ability->use($enemy);
-                if(!$success) {
-                    consoleLog('Способность "' . $ability->getName() .  '" не была применена');
-                    continue;
-                }
-
-                if($enemy->isDead()) {
-                    consoleLog('"' . $enemy->getName() . '" убит');
-                    $this->map->removeCharacter($enemy);
-                    if(empty($this->map->getEnemies())) {
-                        return 'Все противники побеждены. Вы победили!';
-                    }
-                }
+            if($this->map->getEnemiesCount() === 0) {
+                return 'Все противники побеждены. Вы победили!';
             }
 
-            $enemies = $this->map->getEnemies();
-            $randomEnemyKey = array_rand($enemies);
-            $randomEnemy = $enemies[$randomEnemyKey];
-
-            $enemyAbilities = $randomEnemy->getAbilities();
-            $randomEnemyAbilityKey = array_rand($enemyAbilities);
-            $randomEnemyAbility = $enemyAbilities[$randomEnemyAbilityKey];
-            $success = $randomEnemyAbility->use($this->hero);
+            $success = $this->performEnemyAction();
             if(!$success) {
-                consoleLog('Способность "' . $randomEnemyAbility->getName() .  '" не была применена');
                 continue;
             }
 
-            consoleLog('Противник "' . $randomEnemy->getName() . '" использовал "' . $randomEnemyAbility->getName() . '" и нанёс ' . $randomEnemyAbility->getDamage() . ' урона');
             if($this->hero->isDead()) {
-                consoleLog('Вы погибли и проиграли сражение...');
+                return 'Вы погибли и проиграли сражение...';
             }
         }
 
@@ -196,5 +154,87 @@ class Kernel
         $this->map = $map;
 
         return 'Выбрана карта: ' . $map->getName();
+    }
+
+    /**
+     * Запуск хода игрока
+     *
+     * @return bool
+     */
+    private function performHeroAction() : bool
+    {
+        $enemy = $this->map->chooseEnemy();
+        consoleLog('Выбран противник: ' . $enemy->getName());
+
+        $ability = $this->hero->chooseAbility();
+        consoleLog('Применяем "' . $ability->getName() . '" на противника "' . $enemy->getName() . '"');
+
+        $success = $ability->use($enemy);
+        if(!$success) {
+            consoleLog('Способность "' . $ability->getName() .  '" не была применена');
+            return false;
+        }
+
+        if($enemy->isDead()) {
+            consoleLog('"' . $enemy->getName() . '" убит');
+            $this->map->removeCharacter($enemy);
+        }
+
+        return true;
+    }
+
+    /**
+     * Запуск шага противника
+     *
+     * @return bool
+     */
+    private function performEnemyAction() : bool
+    {
+        $enemies = $this->map->getEnemies();
+        $randomEnemyKey = array_rand($enemies);
+        $randomEnemy = $enemies[$randomEnemyKey];
+
+        $enemyAbilities = $randomEnemy->getAbilities();
+        $randomEnemyAbilityKey = array_rand($enemyAbilities);
+        $randomEnemyAbility = $enemyAbilities[$randomEnemyAbilityKey];
+        $success = $randomEnemyAbility->use($this->hero);
+        if($success) {
+            consoleLog('Противник "' . $randomEnemy->getName() . '" использовал "' . $randomEnemyAbility->getName() . '" и нанёс ' . $randomEnemyAbility->getDamage() . ' урона');
+            return true;
+        }
+
+        consoleLog('Способность "' . $randomEnemyAbility->getName() .  '" не была применена');
+        return false;
+    }
+
+    /**
+     * Запуск выбора предмета на карте
+     *
+     * @return bool
+     */
+    private function performObjectAction() : bool
+    {
+        if($this->map->getObjectsCount() === 0) {
+            return false;
+        }
+
+        $object = $this->map->chooseObject();
+        if($object === null) {
+            return false;
+        }
+
+        if($object->getType() === MapObjectEffectType::ALL) {
+            $targets = $this->map->getEnemies();
+            $targets[] = $this->hero;
+        } elseif($object->getType() === MapObjectEffectType::SINGLE) {
+            $target = $this->map->chooseEnemy($this->hero);
+            $targets = [$target];
+        }
+
+        $object->setTargets($targets);
+        $object->trigger();
+        $this->map->removeObject($object);
+
+        return true;
     }
 }

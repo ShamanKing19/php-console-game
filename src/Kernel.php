@@ -3,6 +3,11 @@
 namespace App;
 
 
+use App\Characters\Character;
+use App\Characters\Heroes\AncientRus;
+use App\Characters\Heroes\Batman;
+use App\Characters\Heroes\Spiderman;
+use App\Characters\HeroFactory;
 use App\Enums\MenuActions;
 
 class Kernel
@@ -10,54 +15,86 @@ class Kernel
     private Menu $menu;
 
     private array $actions = [
-
-        MenuActions::CREATE_HERO->value => 'Создать героя',
-        MenuActions::CREATE_MONSTER->value => 'Создать монстра',
-        MenuActions::CREATE_MAP->value => 'Создать карту',
-        MenuActions::ADD_OBJECT_TO_MAP->value => 'Добавить объект на карту',
-        MenuActions::EDIT_OBJECT_ON_MAP->value => 'Изменить объект на карте',
+        MenuActions::PLAY->value => 'Играть',
+        MenuActions::CHOOSE_HERO->value => 'Выбрать героя',
+        MenuActions::CHOOSE_MAP->value => 'Выбрать карту',
         MenuActions::EXIT->value => 'Выйти',
     ];
 
+    private Character $hero;
+
+
     public function run() : void
     {
-        $this->menu = $this->initMenu($this->actions);
-        $this->menu->show();
+        $menu = new Menu($this->actions);
 
         while(true) {
-            $chosenActionKey = $this->menu->listen();
-            match($chosenActionKey) {
-                MenuActions::CREATE_HERO->value => $this->createHero(),
-                MenuActions::CREATE_MONSTER->value => $this->createMonster(),
-                MenuActions::CREATE_MAP->value => $this->createMap(),
-                MenuActions::ADD_OBJECT_TO_MAP->value => $this->addObjectToMap(),
-                MenuActions::EDIT_OBJECT_ON_MAP->value => $this->editObjectOnMap(),
-                MenuActions::EXIT->value => $this->exit()
+            $menu->show();
+            $chosenActionKey = $menu->listen();
+            $result = match($chosenActionKey) {
+                MenuActions::PLAY->value => $this->play(),
+                MenuActions::CHOOSE_HERO->value => $this->chooseHero(),
+                MenuActions::CHOOSE_MAP->value => $this->chooseMap(),
+                MenuActions::EXIT->value => $this->exit(),
+                default => 'Такого действия нет'
             };
+
+            echo PHP_EOL . $result . PHP_EOL . PHP_EOL;
         }
     }
 
     /**
-     * Инициализация меню
+     * Выход из игры
      *
-     * @param array $actions
-     *
-     * @return Menu
+     * @return void
      */
-    private function initMenu(array $actions) : Menu
-    {
-        return new Menu($actions);
-    }
-
     private function exit() : void
     {
         echo 'Игра окончена.';
         die();
     }
 
-    private function createHero() : void
+    private function play() : string
     {
+        if(empty($this->maps)) {
+            return 'Чтобы начать играть, нужно выбрать карту';
+        }
 
+        if(empty($this->heroes)) {
+            return 'Чтобы начать играть, нужно выбрать персонажа';
+        }
+
+        return 'Игра началась...';
+    }
+
+    private function chooseHero() : string
+    {
+        $heroes = [
+            1 => AncientRus::$name,
+            2 => Batman::$name,
+            3 => Spiderman::$name
+        ];
+
+        $menu = new Menu($heroes);
+        $menu->show();
+        $chosenHero = $menu->listen();
+
+        $heroFactory = new HeroFactory();
+
+        $hero = match($chosenHero) {
+            1 => $heroFactory->createAncientRus(),
+            2 => $heroFactory->createBatman(),
+            3 => $heroFactory->createSpiderMan(),
+            default => null
+        };
+
+        if($hero === null) {
+            return 'Герой не найден';
+        }
+
+        $this->hero = $hero;
+
+        return 'Выбран герой: ' . $hero->getName();
     }
 
     private function createMonster() : void
@@ -65,7 +102,7 @@ class Kernel
 
     }
 
-    private function createMap() : void
+    private function chooseMap() : void
     {
 
     }

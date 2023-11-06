@@ -36,12 +36,11 @@ class Menu
      */
     public function listen() : int
     {
-        $action = readline('Верите действие' . PHP_EOL);
+        $action = readline('Верите действие: ');
         if(isset($this->actions[$action])) {
             return $action;
         }
 
-        echo 'Такого действия нет' . PHP_EOL . PHP_EOL;
-        return $this->listen();
+        return -1;
     }
 }

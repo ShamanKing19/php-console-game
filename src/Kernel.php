@@ -73,14 +73,28 @@ class Kernel
         echo 'Количество противников: ' . $this->map->getEnemiesCount() . PHP_EOL . PHP_EOL;
 
         while($this->hero->getHealth() > 0 && $this->map->getEnemiesCount() > 0) {
+            $enemy = $this->map->chooseEnemy();
+            echo 'Выбран противник: ' . $enemy->getName() . PHP_EOL;
+
+            $ability = $this->hero->chooseAbility();
+            echo 'Применяем "' . $ability->getName() . '" на противника "' . $enemy->getName() . '"' . PHP_EOL;
+
+            $success = $ability->use($enemy);
+            if(!$success) {
+                echo 'Способность не была применена' . PHP_EOL;
+                continue;
+            }
+
+            if($enemy->isDead()) {
+                echo '"' . $enemy->getName() . '" убит' . PHP_EOL;
+                $this->map->removeCharacter($enemy);
+            }
+
             /**
-             * 1. Выбор цели
-             * 2. Выбор способности
-             * 3. Вывод результата применения способности
-             * 4. Шаг противника
-             * 5. Проверка жив ли персонаж
-             * 6. Проверка был ли убит противник
-             * 7. Проверка, остались ли ещё противники
+             * 1. Шаг противника
+             * 2. Проверка жив ли персонаж
+             * 3. Проверка был ли убит противник
+             * 4. Проверка, остались ли ещё противники
              */
         }
 

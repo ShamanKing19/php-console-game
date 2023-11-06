@@ -6,13 +6,15 @@ class Menu
 {
 
     private array $actions;
+    private string $prompt;
 
     /**
      * @param array<int,string> $actions Действия
      */
-    public function __construct(array $actions)
+    public function __construct(array $actions, string $prompt = 'Выберите действие: ')
     {
         $this->actions = $actions;
+        $this->prompt = $prompt;
     }
 
     /**
@@ -36,7 +38,7 @@ class Menu
      */
     public function listen() : int
     {
-        $action = readline('Верите действие: ');
+        $action = readline($this->prompt);
         if(isset($this->actions[$action])) {
             return $action;
         }

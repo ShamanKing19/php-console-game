@@ -8,6 +8,20 @@ use App\Enums\CharacterTypes;
 interface Character
 {
     /**
+     * Идентификатор персонажа
+     *
+     * @return int
+     */
+    public function getId() : int;
+
+    /**
+     * Имя персонажа
+     *
+     * @return string
+     */
+    public function getName() : string;
+
+    /**
      * Тип персонажа
      *
      * @return CharacterTypes
@@ -75,4 +89,18 @@ interface Character
      * @return array<Ability>
      */
     public function getAbilities() : array;
+
+    /**
+     * Проверка: жив ли персонаж
+     *
+     * @return bool
+     */
+    public function isAlive() : bool;
+
+    /**
+     * Проверка: мёртв ли персонаж
+     *
+     * @return bool
+     */
+    public function isDead() : bool;
 }

@@ -26,4 +26,11 @@ interface Map
      * @return array<Character>
      */
     public function getEnemies() : array;
+
+    /**
+     * Удаление персонажа с карты
+     *
+     * @return bool
+     */
+    public function removeCharacter(Character $character) : bool;
 }

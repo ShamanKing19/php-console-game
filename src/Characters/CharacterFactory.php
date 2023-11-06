@@ -26,7 +26,7 @@ class CharacterFactory
         return new AncientRus(CharacterTypes::HERO, 9999, 5000, [
             new FistPunch(1000, 0),
             new LegPunch(5000, 0),
-            new SlavicEggClamp(9999, 500),
+            new SlavicEggClamp(9999, 500, 1),
             new GreatRussianShelling(5000, 1000)
         ]);
     }

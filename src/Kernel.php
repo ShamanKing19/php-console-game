@@ -226,6 +226,7 @@ class Kernel
             return false;
         }
 
+        consoleLog('На карте есть объекты, используйте их для победы!');
         $object = $this->map->chooseObject();
         if($object === null) {
             return false;

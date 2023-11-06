@@ -118,9 +118,12 @@ class BaseCharacter implements Character
             $abilityName = $ability->getName() . ' (' . $ability->getDamage() . 'dmg, ' . $ability->getManaCost() . ' mana)';
             if($ability->isLimitedUsage()) {
                 $usesLeft = $ability->getUsesLeft();
+                if($usesLeft === 0) {
+                    continue;
+                }
+
                 $maxUseCount = $ability->getMaxUseCount();
                 $abilityName .= " ($usesLeft/$maxUseCount)";
-
             }
             $actions[$key + 1] = $abilityName;
         }

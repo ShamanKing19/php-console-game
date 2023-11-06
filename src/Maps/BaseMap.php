@@ -52,13 +52,11 @@ class BaseMap implements Map
         while(true) {
             $menu->show();
             $target = $menu->listen();
-            $enemy = $enemies[$target - 1];
-            if(empty($enemy)) {
-                echo 'Нет такого противника' . PHP_EOL;
-                continue;
+            if(isset($enemies[$target - 1])) {
+                return $enemies[$target - 1];
             }
 
-            return $enemy;
+            echo 'Нет такого противника' . PHP_EOL;
         }
     }
 

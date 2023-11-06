@@ -7,6 +7,7 @@ use App\Abilities\GreatRussianShelling;
 use App\Abilities\FistPunch;
 use App\Abilities\LegPunch;
 use App\Abilities\SlavicEggClamp;
+use App\Abilities\SpitToTheFace;
 use App\Characters\Enemies\Lizard;
 use App\Characters\Heroes\AncientRus;
 use App\Characters\Heroes\Batman;
@@ -65,7 +66,7 @@ class CharacterFactory
     public function createLizard() : Lizard
     {
         return new Lizard(CharacterTypes::ENEMY, 5000, 4000, [
-
+            new SpitToTheFace(100, 0)
         ]);
     }
 }

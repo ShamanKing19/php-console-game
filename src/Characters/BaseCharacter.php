@@ -111,13 +111,11 @@ class BaseCharacter implements Character
         while(true) {
             $menu->show();
             $target = $menu->listen();
-            $ability = $abilityList[$target - 1];
-            if(empty($ability)) {
-                echo 'Нет такой способности' . PHP_EOL;
-                continue;
+            if(isset($abilityList[$target - 1])) {
+                return $abilityList[$target - 1];
             }
 
-            return $ability;
+            echo 'Нет такой способности' . PHP_EOL;
         }
     }
 

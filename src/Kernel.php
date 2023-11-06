@@ -70,9 +70,12 @@ class Kernel
         }
 
         echo 'Выбранная карта: ' . $this->map->getName() . PHP_EOL;
-        echo 'Количество противников: ' . $this->map->getEnemiesCount() . PHP_EOL . PHP_EOL;
+        echo 'Количество противников: ' . $this->map->getEnemiesCount() . PHP_EOL;
 
         while($this->hero->getHealth() > 0 && $this->map->getEnemiesCount() > 0) {
+            echo 'Ваше здоровье: ' . $this->hero->getHealth() . PHP_EOL;
+            echo 'Ваша мана: ' . $this->hero->getMana() . PHP_EOL . PHP_EOL;
+
             $enemy = $this->map->chooseEnemy();
             echo 'Выбран противник: ' . $enemy->getName() . PHP_EOL;
 
@@ -81,21 +84,35 @@ class Kernel
 
             $success = $ability->use($enemy);
             if(!$success) {
-                echo 'Способность не была применена' . PHP_EOL;
+                echo 'Способность "' . $ability->getName() .  '" не была применена' . PHP_EOL;
                 continue;
             }
 
             if($enemy->isDead()) {
                 echo '"' . $enemy->getName() . '" убит' . PHP_EOL;
                 $this->map->removeCharacter($enemy);
+                if(empty($this->map->getEnemies())) {
+                    return 'Все противники побеждены. Вы победили!';
+                }
             }
 
-            /**
-             * 1. Шаг противника
-             * 2. Проверка жив ли персонаж
-             * 3. Проверка был ли убит противник
-             * 4. Проверка, остались ли ещё противники
-             */
+            $enemies = $this->map->getEnemies();
+            $randomEnemyKey = array_rand($enemies);
+            $randomEnemy = $enemies[$randomEnemyKey];
+
+            $enemyAbilities = $randomEnemy->getAbilities();
+            $randomEnemyAbilityKey = array_rand($enemyAbilities);
+            $randomEnemyAbility = $enemyAbilities[$randomEnemyAbilityKey];
+            $success = $randomEnemyAbility->use($this->hero);
+            if(!$success) {
+                echo 'Способность "' . $randomEnemyAbility->getName() .  '" не была применена' . PHP_EOL;
+                continue;
+            }
+
+            echo 'Противник "' . $enemy->getName() . '" использовал "' . $randomEnemyAbility->getName() . '" и нанёс ' . $randomEnemyAbility->getDamage() . ' урона' . PHP_EOL;
+            if($this->hero->isDead()) {
+                echo 'Вы погибли и проиграли сражение...' . PHP_EOL;
+            }
         }
 
         return 'Игра окончена.';

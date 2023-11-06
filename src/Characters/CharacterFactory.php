@@ -7,13 +7,19 @@ use App\Abilities\GreatRussianShelling;
 use App\Abilities\FistPunch;
 use App\Abilities\LegPunch;
 use App\Abilities\SlavicEggClamp;
+use App\Characters\Enemies\Lizard;
 use App\Characters\Heroes\AncientRus;
 use App\Characters\Heroes\Batman;
 use App\Characters\Heroes\Spiderman;
 use App\Enums\CharacterTypes;
 
-class HeroFactory
+class CharacterFactory
 {
+    /**
+     * Древний Рус
+     *
+     * @return AncientRus
+     */
     public function createAncientRus() : AncientRus
     {
         return new AncientRus(CharacterTypes::HERO, 9999, 5000, [
@@ -24,6 +30,11 @@ class HeroFactory
         ]);
     }
 
+    /**
+     * Бэтмен
+     *
+     * @return Batman
+     */
     public function createBatman() : Batman
     {
         return new Batman(CharacterTypes::HERO, 2000, 2000, [
@@ -33,11 +44,28 @@ class HeroFactory
         ]);
     }
 
+    /**
+     * Человек-паук
+     *
+     * @return Spiderman
+     */
     public function createSpiderMan() : Spiderman
     {
         return new Spiderman(CharacterTypes::HERO, 3000, 1000, [
             new FistPunch(200, 0),
             new LegPunch(400, 0),
+        ]);
+    }
+
+    /**
+     * Ящер
+     *
+     * @return Lizard
+     */
+    public function createLizard() : Lizard
+    {
+        return new Lizard(CharacterTypes::ENEMY, 5000, 4000, [
+
         ]);
     }
 }

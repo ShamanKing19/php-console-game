@@ -7,8 +7,11 @@ use App\Characters\Character;
 use App\Characters\Heroes\AncientRus;
 use App\Characters\Heroes\Batman;
 use App\Characters\Heroes\Spiderman;
-use App\Characters\HeroFactory;
+use App\Characters\CharacterFactory;
 use App\Enums\MenuActions;
+use App\Maps\Map;
+use App\Maps\MapFactory;
+use App\Maps\TrainingMap;
 
 class Kernel
 {
@@ -16,12 +19,14 @@ class Kernel
 
     private array $actions = [
         MenuActions::PLAY->value => 'Играть',
-        MenuActions::CHOOSE_HERO->value => 'Выбрать героя',
         MenuActions::CHOOSE_MAP->value => 'Выбрать карту',
+        MenuActions::CHOOSE_HERO->value => 'Выбрать героя',
         MenuActions::EXIT->value => 'Выйти',
     ];
 
     private Character $hero;
+
+    private Map $map;
 
 
     public function run() : void
@@ -56,11 +61,11 @@ class Kernel
 
     private function play() : string
     {
-        if(empty($this->maps)) {
+        if(!isset($this->map)) {
             return 'Чтобы начать играть, нужно выбрать карту';
         }
 
-        if(empty($this->heroes)) {
+        if(!isset($this->hero)) {
             return 'Чтобы начать играть, нужно выбрать персонажа';
         }
 
@@ -79,7 +84,7 @@ class Kernel
         $menu->show();
         $chosenHero = $menu->listen();
 
-        $heroFactory = new HeroFactory();
+        $heroFactory = new CharacterFactory();
 
         $hero = match($chosenHero) {
             1 => $heroFactory->createAncientRus(),
@@ -97,23 +102,29 @@ class Kernel
         return 'Выбран герой: ' . $hero->getName();
     }
 
-    private function createMonster() : void
+    private function chooseMap() : string
     {
+        $maps = [
+            1 => TrainingMap::$name,
+        ];
 
-    }
+        $menu = new Menu($maps);
+        $menu->show();
+        $chosenHero = $menu->listen();
 
-    private function chooseMap() : void
-    {
+        $factory = new MapFactory();
 
-    }
+        $map = match($chosenHero) {
+            1 => $factory->createTrainingMap(),
+            default => null
+        };
 
-    private function addObjectToMap() : void
-    {
+        if($map === null) {
+            return 'Карта не найдена';
+        }
 
-    }
+        $this->map = $map;
 
-    private function editObjectOnMap() : void
-    {
-
+        return 'Выбрана карта: ' . $map->getName();
     }
 }

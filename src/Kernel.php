@@ -69,7 +69,22 @@ class Kernel
             return 'Чтобы начать играть, нужно выбрать персонажа';
         }
 
-        return 'Игра началась...';
+        echo 'Выбранная карта: ' . $this->map->getName() . PHP_EOL;
+        echo 'Количество противников: ' . $this->map->getEnemiesCount() . PHP_EOL . PHP_EOL;
+
+        while($this->hero->getHealth() > 0 && $this->map->getEnemiesCount() > 0) {
+            /**
+             * 1. Выбор цели
+             * 2. Выбор способности
+             * 3. Вывод результата применения способности
+             * 4. Шаг противника
+             * 5. Проверка жив ли персонаж
+             * 6. Проверка был ли убит противник
+             * 7. Проверка, остались ли ещё противники
+             */
+        }
+
+        return 'Игра окончена.';
     }
 
     private function chooseHero() : string

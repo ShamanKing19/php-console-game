@@ -25,10 +25,10 @@ class Menu
     public function show() : void
     {
         foreach($this->actions as $key => $action) {
-            echo $key . '. ' . $action . PHP_EOL;
+            consoleLog($key . '. ' . $action);
         }
 
-        echo PHP_EOL;
+        consoleLog();
     }
 
     /**

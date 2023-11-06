@@ -44,7 +44,7 @@ class Kernel
                 default => 'Такого действия нет'
             };
 
-            echo PHP_EOL . $result . PHP_EOL . PHP_EOL;
+            consoleLog(PHP_EOL . $result . PHP_EOL);
         }
     }
 
@@ -55,7 +55,7 @@ class Kernel
      */
     private function exit() : void
     {
-        echo 'Игра окончена.';
+        consoleLog('Игра окончена.');
         die();
     }
 
@@ -69,27 +69,30 @@ class Kernel
             return 'Чтобы начать играть, нужно выбрать персонажа';
         }
 
-        echo 'Выбранная карта: ' . $this->map->getName() . PHP_EOL;
-        echo 'Количество противников: ' . $this->map->getEnemiesCount() . PHP_EOL;
+        consoleLog('Выбранная карта: ' . $this->map->getName());
+        consoleLog('Количество противников: ' . $this->map->getEnemiesCount());
 
         while($this->hero->getHealth() > 0 && $this->map->getEnemiesCount() > 0) {
-            echo 'Ваше здоровье: ' . $this->hero->getHealth() . PHP_EOL;
-            echo 'Ваша мана: ' . $this->hero->getMana() . PHP_EOL . PHP_EOL;
+            consoleLog('Ваше здоровье: ' . $this->hero->getHealth());
+            consoleLog('Ваша мана: ' . $this->hero->getMana());
+            consoleLog();
+
+            // TODO: Добавить возможность выбрать какой-то объект на карте и использовать его (это будет стоить 1 ход вместо атаки)
 
             $enemy = $this->map->chooseEnemy();
-            echo 'Выбран противник: ' . $enemy->getName() . PHP_EOL;
+            consoleLog('Выбран противник: ' . $enemy->getName());
 
             $ability = $this->hero->chooseAbility();
-            echo 'Применяем "' . $ability->getName() . '" на противника "' . $enemy->getName() . '"' . PHP_EOL;
+            consoleLog('Применяем "' . $ability->getName() . '" на противника "' . $enemy->getName() . '"');
 
             $success = $ability->use($enemy);
             if(!$success) {
-                echo 'Способность "' . $ability->getName() .  '" не была применена' . PHP_EOL;
+                consoleLog('Способность "' . $ability->getName() .  '" не была применена');
                 continue;
             }
 
             if($enemy->isDead()) {
-                echo '"' . $enemy->getName() . '" убит' . PHP_EOL;
+                consoleLog('"' . $enemy->getName() . '" убит');
                 $this->map->removeCharacter($enemy);
                 if(empty($this->map->getEnemies())) {
                     return 'Все противники побеждены. Вы победили!';
@@ -105,13 +108,13 @@ class Kernel
             $randomEnemyAbility = $enemyAbilities[$randomEnemyAbilityKey];
             $success = $randomEnemyAbility->use($this->hero);
             if(!$success) {
-                echo 'Способность "' . $randomEnemyAbility->getName() .  '" не была применена' . PHP_EOL;
+                consoleLog('Способность "' . $randomEnemyAbility->getName() .  '" не была применена');
                 continue;
             }
 
-            echo 'Противник "' . $enemy->getName() . '" использовал "' . $randomEnemyAbility->getName() . '" и нанёс ' . $randomEnemyAbility->getDamage() . ' урона' . PHP_EOL;
+            consoleLog('Противник "' . $enemy->getName() . '" использовал "' . $randomEnemyAbility->getName() . '" и нанёс ' . $randomEnemyAbility->getDamage() . ' урона');
             if($this->hero->isDead()) {
-                echo 'Вы погибли и проиграли сражение...' . PHP_EOL;
+                consoleLog('Вы погибли и проиграли сражение...');
             }
         }
 

@@ -115,7 +115,7 @@ class BaseCharacter implements Character
                 return $abilityList[$target - 1];
             }
 
-            echo 'Нет такой способности' . PHP_EOL;
+            consoleLog('Нет такой способности');
         }
     }
 

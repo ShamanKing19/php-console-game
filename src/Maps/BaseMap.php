@@ -56,7 +56,7 @@ class BaseMap implements Map
                 return $enemies[$target - 1];
             }
 
-            echo 'Нет такого противника' . PHP_EOL;
+            consoleLog('Нет такого противника');
         }
     }
 

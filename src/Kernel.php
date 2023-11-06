@@ -8,6 +8,7 @@ use App\Characters\Heroes\AncientRus;
 use App\Characters\Heroes\Batman;
 use App\Characters\Heroes\Spiderman;
 use App\Characters\CharacterFactory;
+use App\Enums\MapObjectEffectType;
 use App\Enums\MenuActions;
 use App\Maps\Map;
 use App\Maps\MapFactory;
@@ -77,25 +78,45 @@ class Kernel
             consoleLog('Ваша мана: ' . $this->hero->getMana());
             consoleLog();
 
-            // TODO: Добавить возможность выбрать какой-то объект на карте и использовать его (это будет стоить 1 ход вместо атаки)
-
-            $enemy = $this->map->chooseEnemy();
-            consoleLog('Выбран противник: ' . $enemy->getName());
-
-            $ability = $this->hero->chooseAbility();
-            consoleLog('Применяем "' . $ability->getName() . '" на противника "' . $enemy->getName() . '"');
-
-            $success = $ability->use($enemy);
-            if(!$success) {
-                consoleLog('Способность "' . $ability->getName() .  '" не была применена');
-                continue;
+            // Выбор объектов на карте
+            $object = null;
+            if($this->map->getObjectsCount() > 0) {
+                $object = $this->map->chooseObject();
             }
 
-            if($enemy->isDead()) {
-                consoleLog('"' . $enemy->getName() . '" убит');
-                $this->map->removeCharacter($enemy);
-                if(empty($this->map->getEnemies())) {
-                    return 'Все противники побеждены. Вы победили!';
+            if($object) {
+                $targets = $this->map->getEnemies();
+                $targets[] = $this->hero;
+                if($object->getType() === MapObjectEffectType::ALL) {
+                    $object->setTargets($targets);
+                    $object->trigger();
+                } elseif($object->getType() === MapObjectEffectType::SINGLE) {
+                    $target = $this->map->chooseEnemy($this->hero);
+                    $targets = [$target];
+                    $object->setTargets($targets);
+                    $object->trigger();
+                }
+
+                $this->map->removeObject($object);
+            } else {
+                $enemy = $this->map->chooseEnemy();
+                consoleLog('Выбран противник: ' . $enemy->getName());
+
+                $ability = $this->hero->chooseAbility();
+                consoleLog('Применяем "' . $ability->getName() . '" на противника "' . $enemy->getName() . '"');
+
+                $success = $ability->use($enemy);
+                if(!$success) {
+                    consoleLog('Способность "' . $ability->getName() .  '" не была применена');
+                    continue;
+                }
+
+                if($enemy->isDead()) {
+                    consoleLog('"' . $enemy->getName() . '" убит');
+                    $this->map->removeCharacter($enemy);
+                    if(empty($this->map->getEnemies())) {
+                        return 'Все противники побеждены. Вы победили!';
+                    }
                 }
             }
 
@@ -112,7 +133,7 @@ class Kernel
                 continue;
             }
 
-            consoleLog('Противник "' . $enemy->getName() . '" использовал "' . $randomEnemyAbility->getName() . '" и нанёс ' . $randomEnemyAbility->getDamage() . ' урона');
+            consoleLog('Противник "' . $randomEnemy->getName() . '" использовал "' . $randomEnemyAbility->getName() . '" и нанёс ' . $randomEnemyAbility->getDamage() . ' урона');
             if($this->hero->isDead()) {
                 consoleLog('Вы погибли и проиграли сражение...');
             }

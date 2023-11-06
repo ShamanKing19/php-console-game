@@ -3,6 +3,7 @@
 namespace App\Maps;
 
 use App\Characters\Character;
+use App\Maps\Objects\MapObject;
 use App\Menu;
 
 class BaseMap implements Map
@@ -10,13 +11,16 @@ class BaseMap implements Map
     public static string $name;
 
     private array $enemies;
+    private array $objects;
 
     /**
      * @param array<Character> $enemies
+     * @param array<MapObject> $objects
      */
-    public function __construct(array $enemies)
+    public function __construct(array $enemies, array $objects = [])
     {
         $this->enemies = $enemies;
+        $this->objects = $objects;
     }
 
     public function getName(): string
@@ -34,15 +38,42 @@ class BaseMap implements Map
         return $this->enemies;
     }
 
-    /**
-     * Отображение меню для выбора противника
-     *
-     * @return Character
-     */
-    public function chooseEnemy() : Character
+
+    public function chooseObject() : ?MapObject
+    {
+        $objects = $this->getObjects();
+        $actions = [];
+        foreach($objects as $key => $object) {
+            $actions[$key + 1] = $object->getName() . ' (' . $object->getValue() . 'HP)';
+        }
+
+        $actions[0] = 'Ничего не использовать';
+
+        $menu = new Menu($actions, 'Выберите объект: ');
+
+        while(true) {
+            $menu->show();
+            $target = $menu->listen();
+            if($target === 0) {
+                return null;
+            }
+
+            if(isset($objects[$target - 1])) {
+                return $objects[$target - 1];
+            }
+
+            consoleLog('Нет такого объекта');
+        }
+    }
+
+    public function chooseEnemy(Character $character = null) : Character
     {
         $enemies = $this->getEnemies();
         $actions = [];
+        if($character !== null) {
+            $actions[] = $character->getName();
+        }
+
         foreach($enemies as $key => $enemy) {
             $actions[$key + 1] = $enemy->getName() . ' (' . $enemy->getHealth() . 'HP)';
         }
@@ -52,11 +83,15 @@ class BaseMap implements Map
         while(true) {
             $menu->show();
             $target = $menu->listen();
+            if($target === 0) {
+                return $character;
+            }
+
             if(isset($enemies[$target - 1])) {
                 return $enemies[$target - 1];
             }
 
-            consoleLog('Нет такого противника');
+            consoleLog('Нет такой цели');
         }
     }
 
@@ -70,5 +105,27 @@ class BaseMap implements Map
         }
 
         return false;
+    }
+
+    public function removeObject(MapObject $objectToRemove): bool
+    {
+        foreach($this->objects as $key => $object) {
+            if($object->getId() === $objectToRemove->getId()) {
+                unset($this->objects[$key]);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function getObjects(): array
+    {
+        return $this->objects;
+    }
+
+    public function getObjectsCount(): int
+    {
+        return count($this->getObjects());
     }
 }

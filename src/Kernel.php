@@ -169,11 +169,19 @@ class Kernel
         $ability = $this->hero->chooseAbility();
         consoleLog('Применяем "' . $ability->getName() . '" на противника "' . $enemy->getName() . '"');
 
+        $manaCost = $ability->getManaCost();
+        if($this->hero->getMana() < $manaCost) {
+            consoleLog('Не хватает маны для применения способности "' . $ability->getName() .  '"');
+            return false;
+        }
+
         $success = $ability->use($enemy);
         if(!$success) {
             consoleLog('Способность "' . $ability->getName() .  '" не была применена');
             return false;
         }
+
+        $this->hero->removeMana($manaCost);
 
         if($enemy->isDead()) {
             consoleLog('"' . $enemy->getName() . '" убит');

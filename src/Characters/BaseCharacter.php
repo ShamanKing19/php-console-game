@@ -73,6 +73,18 @@ class BaseCharacter implements Character
         return $this->mana;
     }
 
+    public function addMana(float $value) : float
+    {
+        $newValue = min($this->mana + $value, $this->maxMana);
+        return $this->mana = $newValue;
+    }
+
+    public function removeMana(float $value): float
+    {
+        $newValue = max($this->mana - $value, 0);
+        return $this->mana = $newValue;
+    }
+
     public function getAbilities() : array
     {
         return $this->abilities;
@@ -103,7 +115,14 @@ class BaseCharacter implements Character
         $abilityList = $this->getAbilities();
         $actions = [];
         foreach($abilityList as $key => $ability) {
-            $actions[$key + 1] = $ability->getName() . ' (' . $ability->getDamage() . 'dmg, ' . $ability->getManaCost() . ' mana)';
+            $abilityName = $ability->getName() . ' (' . $ability->getDamage() . 'dmg, ' . $ability->getManaCost() . ' mana)';
+            if($ability->isLimitedUsage()) {
+                $usesLeft = $ability->getUsesLeft();
+                $maxUseCount = $ability->getMaxUseCount();
+                $abilityName .= " ($usesLeft/$maxUseCount)";
+
+            }
+            $actions[$key + 1] = $abilityName;
         }
 
         $menu = new Menu($actions, 'Выберите способность: ');

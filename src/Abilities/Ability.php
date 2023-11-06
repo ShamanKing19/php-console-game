@@ -47,4 +47,18 @@ interface Ability
      * @return int
      */
     public function getMaxUseCount() : int;
+
+    /**
+     * Оставшееся количество использований
+     *
+     * @return int
+     */
+    public function getUsesLeft() : int;
+
+    /**
+     * Есть ли ограничение на использование способности
+     *
+     * @return bool
+     */
+    public function isLimitedUsage() : bool;
 }

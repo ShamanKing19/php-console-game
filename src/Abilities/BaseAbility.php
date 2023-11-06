@@ -55,4 +55,14 @@ class BaseAbility implements Ability
     {
         return $this->maxUseCount;
     }
+
+    public function getUsesLeft(): int
+    {
+        return $this->getMaxUseCount() - $this->getTimesUsed();
+    }
+
+    public function isLimitedUsage(): bool
+    {
+        return $this->getMaxUseCount() > 0;
+    }
 }

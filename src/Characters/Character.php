@@ -84,6 +84,24 @@ interface Character
     public function getMana() : float;
 
     /**
+     * Добавление маны
+     *
+     * @param float $value
+     * 
+     * @return float
+     */
+    public function addMana(float $value) : float;
+
+    /**
+     * Уменьшение маны
+     *
+     * @param float $value
+     *
+     * @return float
+     */
+    public function removeMana(float $value) : float;
+
+    /**
      * Способности
      *
      * @return array<Ability>
